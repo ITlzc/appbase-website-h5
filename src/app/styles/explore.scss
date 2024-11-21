@@ -1,0 +1,89 @@
+.explore_app {
+  background-color: rgba(238, 238, 238, 1);
+  position: relative;
+  width: 100vw;
+  min-height: 100vh;
+  overflow: hidden;
+
+  .block_8 {
+    margin: 14.4vw 0 0 5.33vw;
+
+    .label_2 {
+      width: 8vw;
+      height: 8vw;
+    }
+
+    .text_4 {
+      overflow-wrap: break-word;
+      color: rgba(152, 152, 152, 1);
+      font-size: 3.73vw;
+      font-family: Outfit;
+      font-weight: normal;
+      text-align: center;
+      white-space: nowrap;
+      line-height: normal;
+      margin-left: 2.13vw;
+    }
+  }
+
+  .group_16 {
+    margin-top: 6.88vw;
+
+    .image_2 {
+      width: 93.33vw;
+      height: 84.8vw;
+      margin: 0 auto;
+    }
+
+    .text-group_5 {
+      position: relative;
+      margin-bottom: 2.67vw;
+
+      .text_5 {
+        overflow-wrap: break-word;
+        color: rgba(51, 49, 50, 1);
+        font-size: 6.67vw;
+        font-family: Outfit;
+        font-weight: 700;
+        text-align: center;
+      }
+
+      .paragraph_1 {
+        margin-top: 2.67vw;
+        overflow-wrap: break-word;
+        color: rgba(51, 49, 50, 1);
+        font-size: 4vw;
+        font-family: Outfit;
+        font-weight: normal;
+        text-align: center;
+      }
+    }
+
+    .image_3 {
+      width: 46.93vw;
+      height: 46.93vw;
+      margin: 0 auto;
+    }
+
+    .image-text_4 {
+      margin: 1.33vw auto 6.67vw;
+
+      .thumbnail_1 {
+        width: 5.33vw;
+        height: 5.33vw;
+        margin-right: 1.33vw;
+      }
+
+      .text-group_2 {
+        overflow-wrap: break-word;
+        color: rgba(51, 49, 50, 1);
+        font-size: 3.2vw;
+        font-family: Outfit;
+        font-weight: normal;
+        text-align: left;
+        white-space: nowrap;
+        line-height: normal;
+      }
+    }
+  }
+}
