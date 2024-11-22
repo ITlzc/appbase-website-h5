@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 
 import {
   getApp,
-  trailApp,
   trial_app_next_time
 } from '../../../lib/ton_supabase_api'
 
@@ -325,53 +324,24 @@ export default function AppsDetail({ params }) {
     console.log('useEffect appData out')
   }, [appData])
 
-  const dela_open_app = async () => {
-    let link = null
-    setShowOpenTip(false)
-    if (appData.link && appData.link.length && appData.link !== 'https://') {
-      link = appData.link
-    }
-    let flag = false
-    in_page_start = true
-    if (appData.points > 0) {
-      if (appData.status == 0 || appData.status == 2) {
-        flag = true
-      }
-      let temp = await trailApp(appData)
-      if (appData.status == 1 && temp == 2) {
-        set_show_success_tip(true)
-      }
-      appInfo(id)
-    } else {
-      flag = true
-    }
-    if (flag) {
-      window.open(link)
-    }
-  }
 
   const open_app = async (index) => {
     console.log('open_app in = ', index)
-    let user_app = appData.user_app && appData.user_app.length && appData.user_app[0]
-    if (!user_app) {
-      let link = null
-      if (appData.link && appData.link.length && appData.link !== 'https://') {
-        link = appData.link
-      }
-      if (link) {
-        window.open(link)
-      }
-      return
+    let link = null
+    // if (open_buttons.length == 1) {
+    //   let item = open_buttons[0]
+    //   link = item.link
+    // } else if (open_buttons.length > 1) {
+    //   let item = open_buttons[index]
+    //   link = item.link
+    // }
+    if (appData.link && appData.link.length && appData.link !== 'https://') {
+      link = appData.link
     }
-    if (appData.status == 0) {
-      if (not_show_again) {
-        dela_open_app()
-      } else {
-        setShowOpenTip(true)
-      }
-      return
+
+    if (link) {
+      window.open(link)
     }
-    dela_open_app()
   }
 
   const click_office = (office) => {

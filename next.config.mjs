@@ -1,4 +1,8 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
+const nextConfig = {
+    matcher: ['/:path*']
+};
+
+
 
 export default nextConfig;
