@@ -3,6 +3,9 @@ import { NextResponse } from 'next/server';
 export function middleware(request) {
     const userAgent = request.headers.get('user-agent') || '';
 
+    console.log('User-Agent:', userAgent);
+
+
     // 判断是否为移动设备
     const isMobile = /Android|iPhone|iPad|iPod/i.test(userAgent);
 
