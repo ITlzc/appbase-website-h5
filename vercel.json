@@ -1,0 +1,16 @@
+{
+    "redirects": [
+      {
+        "source": "/(.*)",
+        "has": [
+          {
+            "type": "header",
+            "key": "user-agent",
+            "value": "(Mobile|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini)"
+          }
+        ],
+        "destination": "https://appbase-web2.vercel.app/",
+        "permanent": false
+      }
+    ]
+  }
