@@ -5,10 +5,10 @@ export function middleware(request) {
 
     console.log('User-Agent:', userAgent);
     
-    const isMobile = /Android|iPhone|iPad|iPod/i.test(userAgent);
+    const isMobile = /Mobile|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
 
     if (!isMobile) {
-        return NextResponse.redirect('https://appbase-web2.vercel.app/');
+        return NextResponse.redirect('https://appbase-website.vercel.app/');
     }
     return NextResponse.next();
 }
