@@ -1,6 +1,6 @@
 const SUPABASE = require("@supabase/supabase-js");
 
-const supabaseUrl = "https://jokqrcagutpmvpilhcfq.supabase.co";
+const supabaseUrl = "https://api.appbase.online";
 const supabaseKey ="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impva3FyY2FndXRwbXZwaWxoY2ZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjYwNDc2MjEsImV4cCI6MjA0MTYyMzYyMX0.ASxFtj2hYVeT7G00arDoNS9zLy8BzdgsSPFRYJw-62E";
 const supabase = SUPABASE.createClient(supabaseUrl, supabaseKey);
 
@@ -47,17 +47,68 @@ export async function getRewardCount() {
 	  .select("id", { count: "exact", head: true })
 	  .neq("points", 0);
 	res.rewardAppCount = appCount;
-	let {
-	  data: taskData,
-	  error: taskError,
-	  count: taskCount,
-	} = await supabase
-	  .from("task")
-	  .select("id", { count: "exact", head: true })
-	  .neq("points", 0);
-	res.rewardTaskCount = taskCount;
+	// let {
+	//   data: taskData,
+	//   error: taskError,
+	//   count: taskCount,
+	// } = await supabase
+	//   .from("task")
+	//   .select("id", { count: "exact", head: true })
+	//   .neq("points", 0);
+	// res.rewardTaskCount = taskCount;
 	return res;
   }
+
+  export async function taskCountFromCache(page,filename) {
+	console.log('taskCountFromCache in = ',filename)
+	let time = get3AMTimestamp()
+	if (!(filename && filename.length)) {
+		filename = 'app_recommend'
+	}
+	let path = `app-category/${time}/task_count.json`
+	console.log('taskCountFromCache path = ',path)
+	let apps = localStorage.getItem(path)
+	if (apps && apps.length) {
+		return JSON.parse(apps)
+	}
+	let expiresIn = 60
+	// const { data:url, error:urlError } = await supabase.storage
+	// .from("cache")
+	// .createSignedUrl(path,expiresIn)
+	const { data:url, error:urlError } = await supabase.storage.from('cache').getPublicUrl(path)
+	console.log('taskCountFromCache getPublicUrl = ',url,urlError)
+	if (urlError) {
+		throw urlError
+	}
+
+	try {
+		let response = await fetch(url.publicUrl)
+		console.log('taskCountFromCache response = ',response)
+		let data = await response.json()
+		console.log('taskCountFromCache download = ',data)
+		// for (let i = 0; i < localStorage.length; i++) {
+		// 	let key = localStorage.key(i)
+		// 	console.log('app-category key = ',key)
+		// 	if (key.indexOf("app-category") > -1) {
+		// 		localStorage.removeItem(key)
+		// 	}
+		// }
+		// localStorage.setItem(path,JSON.stringify(data))
+		// let temp = `app-category/${getLast3AMTimestamp()}/${filename}.json`
+		return data;
+	} catch (error) {
+		console.log('taskCountFromCache error = ',error)
+	}
+	
+	
+	// const { data, error } = await supabase.storage.from('cache').download(url.signedUrl)
+	// console.log('exploreAppDataFromCache download = ',data)
+	// if (error) {
+	// 	console.error("exploreAppDataFromCache Error fetching data:", error);
+	// 	return;
+	// }
+	// return [];
+}
 
 // 指定数量 最近更新的app
 export async function recentUpdate(page,size,filter) {
@@ -104,6 +155,56 @@ export async function recommandData(page,size) {
 	return data;
 }
 
+export async function recommandDataFromCache(page,filename) {
+	console.log('recommandDataFromCache in = ',filename)
+	let time = get3AMTimestamp()
+	if (!(filename && filename.length)) {
+		filename = 'app_recommend'
+	}
+	let path = `app-category/${time}/${filename}_${page}.json`
+	console.log('recommandDataFromCache path = ',path)
+	let apps = localStorage.getItem(path)
+	if (apps && apps.length) {
+		return JSON.parse(apps)
+	}
+	let expiresIn = 60
+	// const { data:url, error:urlError } = await supabase.storage
+	// .from("cache")
+	// .createSignedUrl(path,expiresIn)
+	const { data:url, error:urlError } = await supabase.storage.from('cache').getPublicUrl(path)
+	console.log('recommandDataFromCache getPublicUrl = ',url,urlError)
+	if (urlError) {
+		throw urlError
+	}
+
+	try {
+		let response = await fetch(url.publicUrl)
+		console.log('recommandDataFromCache response = ',response)
+		let data = await response.json()
+		console.log('recommandDataFromCache download = ',data)
+		// for (let i = 0; i < localStorage.length; i++) {
+		// 	let key = localStorage.key(i)
+		// 	console.log('app-category key = ',key)
+		// 	if (key.indexOf("app-category") > -1) {
+		// 		localStorage.removeItem(key)
+		// 	}
+		// }
+		// localStorage.setItem(path,JSON.stringify(data))
+		// let temp = `app-category/${getLast3AMTimestamp()}/${filename}.json`
+		return data;
+	} catch (error) {
+		console.log('recommandDataFromCache error = ',error)
+	}
+	
+	
+	// const { data, error } = await supabase.storage.from('cache').download(url.signedUrl)
+	// console.log('exploreAppDataFromCache download = ',data)
+	// if (error) {
+	// 	console.error("exploreAppDataFromCache Error fetching data:", error);
+	// 	return;
+	// }
+	// return [];
+}
 // APP的分类
 // export async function getCategorys() {
 // 	let res = [];
@@ -152,7 +253,8 @@ export async function getCategorys() {
 	let res = [];
 	const { data: categoryData, error: categoryError } = await supabase
 	  .from("category")
-	  .select("id,title,countApps");
+	  .select("id,title,countApps")
+	  .is('is_show',true);
 	if (categoryError) {
 	  console.error("查询错误:", categoryError);
 	}
@@ -165,7 +267,7 @@ export async function getCategorys() {
 		count: category.countApps,
 	  });
 	}
-	res.unshift({ name: "All", category_id: "", count: appTotalCount });
+	res.unshift({ name: "All", category_id: "app_all", count: appTotalCount });
 	return res
   }
 
@@ -206,116 +308,37 @@ export async function exploreAppData(page,size,filter) {
 	}
 	return data;
 }
-/**
- * 用户是否登录。
- *
- * @returns {string} 返回值 为 当前登录用户的session。
- */ 
-export async function islogin() {
-	// const { data:temp_user,error:user_error } = await supabase.auth.getUser()
-	// if (user_error) {
-	// 	throw user_error
-	// }
-	// console.log('islogin =',temp_user)
-	const { data, error } = await supabase.auth.getSession()
-	if (error) {
-	  throw error
-	}
-	// console.log("data.session = ",data)
-	let user = data && data.session && data.session.user
-	if (user) {
-	  let { data } = await supabase.from("user").select("*").eq('id',user.id)
-	  let profiles = data && data.length && data[0]
-	  user.profiles = profiles
-	//   localStorage.setItem('user_id',user.id)
-	} else {
-		// localStorage.removeItem('user_id')
-	}
 
-	return user
-}
-
-/**
- * 用户登录。
- *
- * @param {string} inviter - 邀请者id，可以为空。
- * @returns {string} 返回值 为 当前登录用户的session。
- */
-export async function login(inviter,tg_user_info) {
-	const { data, error } = await supabase.auth.signInAnonymously({
-		options:{
-			data:{
-				inviter_id:inviter,
-				name: tg_user_info && (tg_user_info.username || ((tg_user_info.first_name || '') + (tg_user_info.last_name || ''))), 
-				avatar:tg_user_info && tg_user_info.photo_url
-			}
-		}
-	})
-	// console.log('login data =',data)
-	if (error) {
-	  throw error
-	}
-	if (!data.session) {
-	  throw new Error('login error,no session found')
-	}
-	let user =  data && data.session && data.session.user
-	if (user) {
-		let { data } = await supabase.from("user").select("*").eq('id',user.id)
-		let profiles = data && data.length && data[0]
-		user.profiles = profiles
-		// localStorage.setItem('user_id',user.id)
-	}
-	
-	if (isTelegramMiniAPP()) {
-		cloud_save_session(data.session)
-		let linked = await islinkTelegram()
-		if (!linked) {
-			await linkTelegramMiniAPP()
-		}
-	}
-	return user
-}
 // app的信息数据
 export async function getApp(app_id) {
 	console.log('getApp in = ',app_id)
-	let user = await islogin()
-	let select = supabase
-	.from("app")
-	.select(
-		"id,name,is_forward,icon,description,points,category_id,link,images,appPlatforms,caption,ranking_in_category,rating,category(title)"
-	)
-	.eq("id", app_id)
-	if (user) {
-		select = supabase
+	let { data: appInfo, error } = await supabase
 		.from("app")
 		.select(
-			"id,name,is_forward,icon,description,points,category_id,link,images,appPlatforms,caption,ranking_in_category,rating,category(title),user_app(*)"
+			"id,name,is_forward,icon,description,points,category_id,link,images,appPlatforms,caption,category(title)"
 		)
-		.eq("id", app_id)
-		.eq('user_app.user_id',user.id)
-	}
-	let { data: appInfo, error } = await select
 		.order("recommend", { ascending: false })
+		.eq("id", app_id)
 		.single();
 	if (error) {
 		console.error("Error fetching data:", error);
 		return;
 	}
 	console.log('getApp appInfo = ',appInfo)
-	// appInfo.grade = 0;
+	appInfo.grade = 0;
 	appInfo.reviews = 0;
-	// // 查询app_id在category_id分类下的排名
-	// const { data: appRankData, error: appRankError } = await supabase
-	// 	.from("app")
-	// 	.select("id, rating")
-	// 	.eq("category_id", appInfo.category_id) // 按 category_id 过滤
-	// 	.order("rating", { ascending: false }) // 按 rank 降序排列
-	// 	.order('updated_at',{ ascending: false })
+	// 查询app_id在category_id分类下的排名
+	const { data: appRankData, error: appRankError } = await supabase
+		.from("app")
+		.select("id, rating")
+		.eq("category_id", appInfo.category_id) // 按 category_id 过滤
+		.order("rating", { ascending: false }) // 按 rank 降序排列
+		.order('updated_at',{ ascending: false })
 
-	// if (appRankError) {
-	// 	console.error("查询错误:", appRankError);
-	// 	return;
-	// }
+	if (appRankError) {
+		console.error("查询错误:", appRankError);
+		return;
+	}
 	// // 找到 app_id 的排名
 	// const rankPosition = appRankData.findIndex((app) => app.id === app_id) + 1; // 数组下标 + 1 为排名
 	// console.log(
@@ -323,24 +346,111 @@ export async function getApp(app_id) {
 	// );
 	// appInfo.rank = rankPosition;
 
-	const {count,error: reviewsError } = await supabase
+	const { data: reviews, error: reviewsError } = await supabase
 		.from("user_reviews")
-		.select("score", { count: "exact" ,head:true}) // 使用 count 选项获取总条数
+		.select("score", { count: "exact" }) // 使用 count 选项获取总条数
 		.eq("app_id", app_id);
 	if (reviewsError) {
 		console.error("查询错误:", error);
+	} else if (reviews.length === 0) {
+		console.log("not found reviews");
+	} else {
+		const totalReviews = reviews.length;
+		const avgScore =
+			reviews.reduce((sum, review) => sum + review.score, 0) / totalReviews;
+		console.log(`总评论数: ${totalReviews}`);
+		console.log(`平均评分: ${avgScore.toFixed(2)}`);
+		appInfo.grade = totalReviews;
+		appInfo.reviews = avgScore.toFixed(2);
 	}
-	appInfo.reviews_count = count
-	// else {
-	// 	const totalReviews = reviews.length;
-	// 	const avgScore =
-	// 		reviews.reduce((sum, review) => sum + review.score, 0) / totalReviews;
-	// 	console.log(`总评论数: ${totalReviews}`);
-	// 	console.log(`平均评分: ${avgScore.toFixed(2)}`);
-	// 	appInfo.grade = totalReviews;
-	// 	appInfo.reviews = avgScore.toFixed(2);
-	// }
 	return appInfo;
+}
+
+function get3AMTimestamp() {
+    const now = new Date(); // 当前时间
+    const currentHour = now.getHours(); // 当前小时
+    const currentMinute = now.getMinutes(); // 当前分钟
+
+    // 创建当天凌晨 3 点的时间
+    const today3AM = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 3, 0, 0, 0);
+
+    // 如果当前时间早于凌晨 3:01，取前一天凌晨 3 点
+    if (currentHour < 3 || (currentHour === 3 && currentMinute < 1)) {
+        today3AM.setDate(today3AM.getDate() - 1); // 前一天
+    }
+
+	let timestamp = Math.floor(today3AM.getTime() / 1000);
+	timestamp = timestamp - getTimezoneOffsetFromBeijing()
+	console.log('get3AMTimestamp = ',now,today3AM,timestamp,getTimezoneOffsetFromBeijing())
+
+    return timestamp
+}
+
+function getTimezoneOffsetFromBeijing() {
+    const currentDate = new Date();
+    const currentOffset = currentDate.getTimezoneOffset(); // 当前时区与 UTC 的偏移（分钟）
+	
+    const beijingOffset = 8 * 60; // 东八区的偏移（分钟）
+    
+    let offsetFromBeijing = currentOffset - beijingOffset;
+	if (beijingOffset > currentOffset) {
+		offsetFromBeijing = beijingOffset + currentOffset
+	}
+	console.log('getTimezoneOffsetFromBeijing = ',currentOffset,beijingOffset,offsetFromBeijing)
+    
+    // 返回当前时区与东八区的偏移
+    return offsetFromBeijing * 60;
+}
+
+export async function exploreAppDataFromCache(filename,page) {
+	console.log('exploreAppDataFromCache in = ',filename)
+	let time = get3AMTimestamp()
+	if (!(filename && filename.length)) {
+		filename = 'app_all'
+	}
+	let path = `app-category/${time}/${filename}_${page}.json`
+	console.log('exploreAppDataFromCache path = ',path)
+	let apps = localStorage.getItem(path)
+	if (apps && apps.length) {
+		return JSON.parse(apps)
+	}
+	let expiresIn = 60
+	// const { data:url, error:urlError } = await supabase.storage
+	// .from("cache")
+	// .createSignedUrl(path,expiresIn)
+	const { data:url, error:urlError } = await supabase.storage.from('cache').getPublicUrl(path)
+	console.log('exploreAppDataFromCache getPublicUrl = ',url,urlError)
+	if (urlError) {
+		throw urlError
+	}
+
+	try {
+		let response = await fetch(url.publicUrl)
+		console.log('exploreAppDataFromCache response = ',response)
+		let data = await response.json()
+		console.log('exploreAppDataFromCache download = ',data)
+		// for (let i = 0; i < localStorage.length; i++) {
+		// 	let key = localStorage.key(i)
+		// 	console.log('app-category key = ',key)
+		// 	if (key.indexOf("app-category") > -1) {
+		// 		localStorage.removeItem(key)
+		// 	}
+		// }
+		// localStorage.setItem(path,JSON.stringify(data))
+		// let temp = `app-category/${getLast3AMTimestamp()}/${filename}.json`
+		return data;
+	} catch (error) {
+		console.log('exploreAppDataFromCache error = ',error)
+	}
+	
+	
+	// const { data, error } = await supabase.storage.from('cache').download(url.signedUrl)
+	// console.log('exploreAppDataFromCache download = ',data)
+	// if (error) {
+	// 	console.error("exploreAppDataFromCache Error fetching data:", error);
+	// 	return;
+	// }
+	// return [];
 }
 
 // MiniAPP

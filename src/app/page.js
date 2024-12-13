@@ -5,15 +5,12 @@ import { useEffect, useState, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 
 import {
-  getAnnouncement,
   getRewardCount,
   recentUpdate,
-  recommandData,
-  exploreAppData,
   getCategorys,
-  searchData,
-  getApp,
-  getSlideshow
+  exploreAppDataFromCache,
+  recommandDataFromCache,
+  taskCountFromCache
 } from '../lib/ton_supabase_api'
 import Header from './components/Header';
 import Link from 'next/link';
@@ -49,8 +46,10 @@ function HomeComponent() {
   const fetchReward = async () => {
     set_loading(true)
     let temp_reward = await getRewardCount()
+    let task_count = await taskCountFromCache()
+    temp_reward.rewardTaskCount = task_count.total_count
     set_loading(false)
-    console.log('fetchReward =', temp_reward)
+    console.log('fetchReward =', temp_reward,task_count)
     set_reward(temp_reward)
   }
 
@@ -79,10 +78,16 @@ function HomeComponent() {
   const fetchRecommandApps = async (page, size) => {
     console.log('fetchRecommandApps in = ', page, size)
     set_loading(true)
-    let apps = await recommandData(page, size)
+    let data = await recommandDataFromCache(page)
+    let apps = data.apps
     set_loading(false)
     console.log('fetchRecommandApps =', apps)
     if (apps && apps.length) {
+      let temp = Math.ceil(data.total_count / 3) 
+      if (temp == page) {
+        page = 0
+      }
+      console.log('fetchRecommandApps page =', page,temp)
       set_recommand_page(page)
     }
     apps.map(app => {
@@ -93,7 +98,12 @@ function HomeComponent() {
 
   const fetchExploreApps = async (page, size, filter) => {
     set_loading(true)
-    let apps = await exploreAppData(page, size, filter)
+    let category_id = 'app_all'
+    if (filter && filter.category_id && filter.category_id.length) {
+      category_id = filter.category_id
+    }
+    let data = await exploreAppDataFromCache(category_id,page)
+    let apps = data.apps
     set_loading(false)
     console.log('fetchExploreApps =', apps)
     apps.map(app => {

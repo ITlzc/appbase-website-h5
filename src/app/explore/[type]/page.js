@@ -11,6 +11,7 @@ import {
     exploreAppData,
     getCategorys,
     searchData,
+    exploreAppDataFromCache
 } from '../../../lib/ton_supabase_api'
 import Footer from '@/app/components/Footer';
 
@@ -66,7 +67,13 @@ export default function MoreApps({ params }) {
 
     const fetchExploreApps = async (page, size, filter) => {
         set_loading(true)
-        let temp_apps = await exploreAppData(page, size, filter)
+        let category_id = 'app_all'
+        if (filter && filter.category_id && filter.category_id.length) {
+            category_id = filter.category_id
+        }
+        let data = await exploreAppDataFromCache(category_id, page)
+        let temp_apps = data.apps
+        // let temp_apps = await exploreAppData(page, size, filter)
         set_loading(false)
         console.log('fetchExploreApps =', temp_apps)
         if (temp_apps && temp_apps.length) {
@@ -77,6 +84,9 @@ export default function MoreApps({ params }) {
         })
         let temp = apps
         temp = temp.concat(temp_apps)
+        if (page == 1) {
+            temp = temp_apps
+        }
         set_apps(temp)
     }
 
