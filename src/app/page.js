@@ -7,10 +7,12 @@ import { useRouter } from 'next/navigation';
 import {
   getRewardCount,
   recentUpdate,
+  recommandData,
   getCategorys,
   exploreAppDataFromCache,
   recommandDataFromCache,
-  taskCountFromCache
+  taskCountFromCache,
+  recommandTotal
 } from '../lib/ton_supabase_api'
 import Header from './components/Header';
 import Link from 'next/link';
@@ -78,12 +80,14 @@ function HomeComponent() {
   const fetchRecommandApps = async (page, size) => {
     console.log('fetchRecommandApps in = ', page, size)
     set_loading(true)
-    let data = await recommandDataFromCache(page)
-    let apps = data.apps
+    // let data = await recommandDataFromCache(page)
+    // let apps = data.apps
+    let apps = await recommandData(page, size)
+    let total = await recommandTotal()
     set_loading(false)
     console.log('fetchRecommandApps =', apps)
     if (apps && apps.length) {
-      let temp = Math.ceil(data.total_count / 3) 
+      let temp = Math.ceil(total / 3) 
       if (temp == page) {
         page = 0
       }
