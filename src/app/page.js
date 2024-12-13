@@ -80,10 +80,11 @@ function HomeComponent() {
   const fetchRecommandApps = async (page, size) => {
     console.log('fetchRecommandApps in = ', page, size)
     set_loading(true)
-    // let data = await recommandDataFromCache(page)
-    // let apps = data.apps
-    let apps = await recommandData(page, size)
-    let total = await recommandTotal()
+    let data = await recommandDataFromCache(page)
+    let apps = data.apps
+    let total = data.total_count
+    // let apps = await recommandData(page, size)
+    // let total = await recommandTotal()
     set_loading(false)
     console.log('fetchRecommandApps =', apps)
     if (apps && apps.length) {
