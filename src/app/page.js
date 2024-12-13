@@ -193,7 +193,7 @@ function HomeComponent() {
                 </div>
               </div>
 
-              <div className="exBtn flex-row justify-center align-center" onClick={to_mini_app}>Explore AppBase Miniapp</div>
+              <a className="exBtn flex-row justify-center align-center" href='https://t.me/AppBaseBot/app' target='_blank' >Explore AppBase Miniapp</a>
             </div>
             <Carousel />
 

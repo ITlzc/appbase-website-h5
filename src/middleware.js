@@ -8,7 +8,7 @@ export function middleware(request) {
     const isMobile = /Mobile|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
 
     if (!isMobile) {
-        return NextResponse.redirect('https://appbase-website.vercel.app/');
+        return NextResponse.redirect('https://appbase.online/');
     }
     return NextResponse.next();
 }
